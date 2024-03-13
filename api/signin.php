@@ -17,11 +17,14 @@ if ($num_rows > 0) {
         $response['Status'] = 'Logged In';
         $response['User_Id'] = $id;
         $response['Username'] = $username;
+        $response['Login'] = true;
     } else {
-        $response['Status'] = 'Incorrect Username or Password';
+        $response['Message'] = 'Incorrect Username or Password';
+        $response['Login'] = false;
     }
 } else {
-    $response['Status'] = 'Username Not Found!';
+    $response['Message'] = 'Username Not Found!';
+    $response['Login'] = false;
 }
 
 echo json_encode($response);

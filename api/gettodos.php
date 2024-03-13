@@ -1,11 +1,10 @@
 <?php
 include 'connection.php';
 
-$todo_id = $_GET('todo_id');
-$user_id = $_GET('user_id');
+$user_id = $_GET['user_id'];
 
-$query = $mysqli->prepare('SELECT * FROM todos WHERE id=? AND user_id=?');
-$query->bind_param('ii', $todo_id, $user_id);
+$query = $mysqli->prepare('SELECT * FROM todos WHERE user_id=?');
+$query->bind_param('i', $user_id);
 $query->execute();
 $query->store_result();
 $num_rows = $query->num_rows();
@@ -23,5 +22,8 @@ if ($num_rows > 0) {
     }
     $response['Status'] = 'Success';
     $response['Todos'] = $todos;
+} else {
+    $response['Status'] = 'Failed';
+    $response['Message'] = 'No todos found';
 }
 echo json_encode($response);
