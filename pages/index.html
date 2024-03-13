@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="/styles/colors.css">
+    <link rel="stylesheet" href="/styles/utilities.css">
+</head>
+<body>
+    <section id="login-component" class="login-component">
+        <div class="container">
+            <h2 class="app-name primary-text">Todo</h2>
+            <form class="flex center column" id="login-form">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <button class="login-btn primary-bg white-text" type="submit">Login</button>
+            </form>
+        </div>
+    </section>
+    <section id="todo-component" class="todo-component remove">
+        <div class="container">
+            <div class="welcome-section">
+                <h2 class="welcome-message primary-text">Tasks list</h2>
+            </div>
+            <div class="inputs-container">
+                <div class="inputs center">
+                    <input class="todo-input" type="text" id="myInput" placeholder="Add a task...">
+                    <button class="add-btn primary-bg white-text" id="add-btn">Add</button>
+                </div>
+                <div class="todo-list flex column" id="todo-list"></div>
+            </div>
+            <div class="exit-section">
+                <a id="logout-btn" class="logout-btn primary-text" href="#">x</a>
+            </div>
+        </div>
+    </section>
+    <script src="/script/index.js"></script>
+</body>
+</html>
