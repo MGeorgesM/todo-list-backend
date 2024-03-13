@@ -20,6 +20,6 @@ if ($email_exists > 0) {
     $query->bind_param('sss', $username, $email, $hashed_password);
     $query->execute();
     $response['Status'] = 'Success!';
-    $response['Message'] = 'User $username Was Created Successfully';
+    $response['Message'] = "User $username Was Created Successfully";
 }
 echo json_encode($response);

@@ -1,11 +1,11 @@
 <?php
 include 'connection.php';
 
-$username = $_POST['username'];
+$loginInput = $_POST['login'];
 $password = $_POST['password'];
 
-$query = $mysqli->prepare('SELECT id,username,password FROM users WHERE username=?');
-$query->bind_param('s', $username);
+$query = $mysqli->prepare('SELECT id,username,password FROM users WHERE username=? OR email=?');
+$query->bind_param('ss', $loginInput, $loginInput);
 $query->execute();
 $query->store_result();
 $query->bind_result($id, $username, $hashed_password);
