@@ -19,10 +19,9 @@ if ($id_exists > 0) {
     $response['Message'] = 'Todo $todo_id was updated successfully';
 } else {
     $response['Status'] = 'Adding new todo';
-    $query = $mysqli->prepare(
-        'INSERT INTO todos(id,description,user_id) VALUES(?,?,?)'
-    );
+    $query = $mysqli->prepare('INSERT INTO todos(id,description,user_id) VALUES(?,?,?)');
     $query->bind_param('isi', $todo_id, $todo_description, $user_id);
     $query->execute();
     $response['Message'] = 'Todo $todo_id for user id: $user_id was created';
 }
+echo json_encode($response);
