@@ -15,7 +15,6 @@ if ($todo_found > 0) {
     $delete_query = $mysqli->prepare('DELETE FROM todos WHERE id =?');
     $delete_query->bind_param('i', $todo_id);
     $delete_query->execute();
-    $response['Status'] = 'Deleting';
     $response['Message'] = "Todo id $todo_id was deleted successfully";
 
     if ($complete) {
