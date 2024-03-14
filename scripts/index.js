@@ -70,79 +70,81 @@ const addTodoToDB = async (user_id,todo_description ) => {
     await axios.post('/createtodo.php', data);
 }
 
-function createTodo() {
-    const inputText = input.value.trim();
-    if (inputText === '') {
+const addTodo = () => {
+    const description = descriptionInput.value.trim();
+    if (description === '') {
         alert('Please enter a valid task');
         return;
     }
 
-    input.value = "";
-    todoElementGenerator(inputText);
-    todoItemEventListener();
-    todoDeleteEventListener();
-    save();
+    descriptionInput.value = "";
+    addTodoToDB(currentUserID,description);
+    populateTodos(currentUserID);
 }
 
-const todoElement = (inputText, isChecked) => {
-    const checkClass = isChecked ? 'checked' : '';
+const getTodos = async (user_id) => {
+    try {
+        const response = await axios.get(`/gettodos.php?user_id=${user_id}`);
+        return response.data;
+    } catch (error) {
+        throw Error(error.response.data.Message);
+    }
+}
+
+const populateTodos = async () => {
+    const todos = await getTodos(currentUserID);
+    console.log(todos)
+    todos.forEach(todo => {
+        const {description, complete} = todo;
+        generateTodo(description, complete);
+    });
+
+    todoItemEventListener();
+    todoDeleteEventListener();    
+}
+
+const generateTodo = (description, complete) => {
+    todoList.innerHTML += todoElement(description, complete);
+}
+
+const todoElement = (description, complete) => {
+    const checkClass = complete ? 'checked' : '';
     return `<div class='todo-item flex space-between primary-text'>
-                <p class='todo-text ${checkClass}'>${inputText}</p>
+                <p class='todo-text ${checkClass}'>${description}</p>
                 <button class='delete-btn primary-text white-bg'>x</button>
             </div>`;
 }
 
-function todoElementGenerator(inputText, isChecked) {
-
-    todoList.innerHTML += todoElement(inputText, isChecked);
-}
-
-function todoItemEventListener() {
+const todoItemEventListener = () => {
     const todoItems = document.querySelectorAll('.todo-item');
     for (let i = 0; i < todoItems.length; i++) {
         todoItems[i].addEventListener("click", function () {
             const todoItem = todoItems[i].querySelector('.todo-text');
-            todoItem.classList.toggle("checked");
-            save();
+            todoItem.classList.toggle("checked");;
         })
     }
 }
 
-function todoDeleteEventListener() {
+const todoDeleteEventListener = () => {
     const todoDeleteBtns = document.querySelectorAll('.delete-btn');
     for (let i = 0; i < todoDeleteBtns.length; i++) {
         todoDeleteBtns[i].addEventListener("click", function () {
             const todoToDelete = todoDeleteBtns[i].parentNode;
             todoToDelete.remove();
-            save();
         })
     }
 }
 
-function save() {
-    const todosToSave = [];
-    const todosElements = document.querySelectorAll('.todo-text');
-    for (let i = 0; i < todosElements.length; i++) {
-        const todoToSave = {
-            todoText: todosElements[i].textContent,
-            isChecked: todosElements[i].classList.contains('checked'),
-        };
-
-        todosToSave.push(todoToSave)
-    }
-
-    localStorage.setItem('todos', JSON.stringify(todosToSave));
-}
-
-loginForm.addEventListener('submit', function (event) {
+loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const login = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     signIn(login,password);
+    populateTodos(currentUserID);
 
 });
 
-addBtn.addEventListener('click', addTodoToDB);
+addBtn.addEventListener('click', addTodo);
 
 logoutBtn.addEventListener('click', function () {
     loginComponent.classList.toggle('remove');
