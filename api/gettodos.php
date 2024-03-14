@@ -11,12 +11,13 @@ $num_rows = $query->num_rows();
 
 if ($num_rows > 0) {
     $todos = [];
-    $query->bind_result($todo_id, $todo_description, $user_id);
+    $query->bind_result($todo_id, $todo_description, $user_id, $complete);
     while ($query->fetch()) {
         $todo = [
             'id' => $todo_id,
             'description' => $todo_description,
             'user_id' => $user_id,
+            'complete' => $complete,
         ];
         $todos[] = $todo;
     }

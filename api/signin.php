@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
+header("Access-Control-Allow-Headers: Content-Type");
+
 include 'connection.php';
 
 $loginInput = $_POST['login'];
@@ -17,14 +20,13 @@ if ($num_rows > 0) {
         $response['Status'] = 'Logged In';
         $response['User_Id'] = $id;
         $response['Username'] = $username;
-        $response['Login'] = true;
     } else {
+        http_response_code(401);
         $response['Message'] = 'Incorrect Username or Password';
-        $response['Login'] = false;
     }
 } else {
+    http_response_code(404);
     $response['Message'] = 'Username Not Found!';
-    $response['Login'] = false;
 }
 
 echo json_encode($response);
