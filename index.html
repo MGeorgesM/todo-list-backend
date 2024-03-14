@@ -14,19 +14,45 @@
             <h2 class="app-name primary-text">Todo</h2>
             <form class="flex center column" id="login-form">
                 <div class="form-group">
-                    <input type="text" id="username" name="username" placeholder="Username" required>
+                    <input type="text" id="login" name="username" placeholder="Username" required>
                 </div>
                 <div class="form-group">
                     <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
+                <p class="validationDisplay" id="validationDisplaySignIn"></p>
                 <button class="login-btn primary-bg white-text" type="submit">Login</button>
+                <p>No Account? <a href="#" id="register-link" class="register-link">Register Now</a></p>
+            </form>
+        </div>
+    </section>
+    <section id="register-component" class="register-component remove">
+        <div class="container">
+            <h2 class="app-name primary-text">Todo</h2>
+            <form class="flex center column" id="register-form">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="register-password" name="password" placeholder="Password" required>
+                </div>
+                <p class="validationDisplay" id="validationDisplaySignUp"></p>
+                <button class="register-btn primary-bg white-text" type="submit">Register</button>
             </form>
         </div>
     </section>
     <section id="todo-component" class="todo-component remove">
         <div class="container">
-            <div class="welcome-section">
-                <h2 class="welcome-message primary-text">Tasks list</h2>
+            <div class="welcome-section flex space-between">
+                <div>
+                    <h2 class="welcome-message primary-text">Tasks list</h2>
+                    <p class="score primary-text">Score: <strong id="score-display">10</strong></p>
+                </div>
+                <div class="exit-section">
+                    <a id="logout-btn" class="logout-btn primary-text" href="#">x</a>
+                </div>
             </div>
             <div class="inputs-container">
                 <div class="inputs center">
@@ -34,9 +60,6 @@
                     <button class="add-btn primary-bg white-text" id="add-btn">Add</button>
                 </div>
                 <div class="todo-list flex column" id="todo-list"></div>
-            </div>
-            <div class="exit-section">
-                <a id="logout-btn" class="logout-btn primary-text" href="#">x</a>
             </div>
         </div>
     </section>

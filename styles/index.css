@@ -4,14 +4,17 @@
     box-sizing: border-box;
 }
 
+a {
+    text-decoration: none;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #212529;
 }
 
 .container {
-    max-width: 40%;
-    min-width: 400px;
+    width: 400px;
     margin: 256px auto;
     padding: 16px ;
     border-radius: 8px;
@@ -31,8 +34,16 @@ body {
     margin-bottom: 12px;
 }
 
-.login-btn {
-    padding-left: 4px;
+.exit-section {
+    padding: 12px;
+    width: 10%;
+}
+
+
+.login-btn, .register-btn {
+    width: 10%;
+    padding-top: 4px;
+    padding-right: 4px;
 }
 
 .logout-btn:link {
@@ -51,7 +62,7 @@ input {
     border-radius: 4px;;
 }
 
-.login-btn {
+.login-btn, .register-btn {
     width: 100%;
     padding: 12px;
     margin: 16px auto 32px auto;
@@ -61,7 +72,7 @@ input {
     font-size: 18px;
 }
 
-.login-btn:hover {
+.login-btn:hover, .register-btn:hover {
     background-color: #74c0fc;
 }
 
@@ -136,6 +147,18 @@ input {
     color: #a5d8ff;
 }
 
+.score {
+    padding: 4px;
+}
+
+.validationDisplay {
+    color: red;
+}
+
+.register-link:hover {
+    color: #74c0fc;
+}
+
 .remove {
     display: none;
 }
@@ -167,15 +190,5 @@ input {
     .todo-input {
         border-bottom-left-radius: 0;
         border-top-right-radius: 4px;
-    }
-
-    .exit-section {
-        margin: auto 0 0 0;
-        position: relative;
-    }
-
-    .logout-btn {
-        position: absolute;
-        bottom: 0;
     }
 }

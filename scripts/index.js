@@ -1,23 +1,42 @@
 const loginForm = document.getElementById('login-form');
 const loginComponent = document.getElementById('login-component');
+const validationDisplaySignIn = document.getElementById('validationDisplaySignIn');
+const registerLink = document.getElementById('register-link');
+
+const registerForm = document.getElementById('register-form');
+const registerComponent = document.getElementById('register-component');
+const validationDisplaySignUp = document.getElementById('validationDisplaySignUp');
+
 const todoComponent = document.getElementById('todo-component');
 const descriptionInput = document.getElementById('descriptionInput');
 const addBtn = document.getElementById('add-btn');
 const todoList = document.getElementById('todo-list');
 const logoutBtn = document.getElementById('logout-btn');
+const scoreDisplay = document.getElementById('score-display');
+
 
 let currentUserID = null;
-let todoItems = [];
-let todoDeleteBtns = [];
+let currentUserScore = null;
 
 
 axios.defaults.baseURL = 'http://localhost/api'
 
-const createTodo = async (user_id, todo_description) => {
-    await  axios.post('/createtodo.php', {
-        user_id,
-        todo_description,
-    })
+
+const createTodo = async (user_id,todo_description ) => {
+    const data = new FormData();
+    data.append('user_id', user_id);
+    data.append('todo_description', todo_description);
+
+    await axios.post('/createtodo.php', data);
+    populateTodos(currentUserID);
+}
+
+const deleteTodo = async (todo_id) => {
+    const data = new FormData();
+    data.append('todo_id',todo_id);
+
+    await axios.post('/deletetodo.php', data);
+    populateTodos(currentUserID);
 }
 
 const signIn = async (login,password) => {
@@ -28,20 +47,23 @@ const signIn = async (login,password) => {
 
     try {
         const response = await axios.post('/signin.php', data);
-        if (response.status === 200) {
+        if (response.data.LoggedIn) {
             loginComponent.classList.toggle('remove');
             todoComponent.classList.toggle('remove');
             currentUserID = response.data.User_Id;
+            currentUserScore = response.data.Score;
+            populateTodos(currentUserID);
+            localStorage.setItem('currentUser', JSON.stringify(currentUserID));
         } else {
             throw Error(response.data.Message);
         }
     }
     catch (error) {
-        validationDisplay.innerHTML = error.message;        
+        validationDisplaySignIn.innerHTML = error.message;        
     }
 }
 
-const singUp = async (username, email, password) => {
+const signUp = async (username, email, password) => {
     const data = new FormData();
     data.append('username',username);
     data.append('email',email);
@@ -50,24 +72,16 @@ const singUp = async (username, email, password) => {
     try {
         const response = await axios.post('/signup.php', data);
 
-        if(response.status === 200) {
-            loginComponent.classList.toggle('remove');
+        if(response.data.Registered) {
+            registerComponent.classList.toggle('remove');
             todoComponent.classList.toggle('remove');
         } else {
             throw Error(response.data.Message)
         }
 
     } catch (error) {
-        validationDisplay.innerHTML = error.message
+        validationDisplaySignUp.innerHTML = error.message
     }
-}
-
-const addTodoToDB = async (user_id,todo_description ) => {
-    const data = new FormData();
-    data.append('user_id', user_id);
-    data.append('todo_description', todo_description);
-
-    await axios.post('/createtodo.php', data);
 }
 
 const addTodo = () => {
@@ -78,40 +92,42 @@ const addTodo = () => {
     }
 
     descriptionInput.value = "";
-    addTodoToDB(currentUserID,description);
-    populateTodos(currentUserID);
+    createTodo(currentUserID,description);
 }
 
 const getTodos = async (user_id) => {
     try {
         const response = await axios.get(`/gettodos.php?user_id=${user_id}`);
-        return response.data;
+        return response.data.Todos;
     } catch (error) {
         throw Error(error.response.data.Message);
     }
 }
 
 const populateTodos = async () => {
+    todoList.innerHTML = '';
     const todos = await getTodos(currentUserID);
-    console.log(todos)
+    if (!todos) {
+        return
+    }
     todos.forEach(todo => {
-        const {description, complete} = todo;
-        generateTodo(description, complete);
+        const {id, description, complete} = todo;
+        generateTodo(id, description, complete);
     });
 
     todoItemEventListener();
     todoDeleteEventListener();    
 }
 
-const generateTodo = (description, complete) => {
-    todoList.innerHTML += todoElement(description, complete);
+const generateTodo = (id, description, complete) => {
+    todoList.innerHTML += todoElement(id, description, complete);
 }
 
-const todoElement = (description, complete) => {
+const todoElement = (id, description, complete) => {
     const checkClass = complete ? 'checked' : '';
     return `<div class='todo-item flex space-between primary-text'>
                 <p class='todo-text ${checkClass}'>${description}</p>
-                <button class='delete-btn primary-text white-bg'>x</button>
+                <button class='delete-btn primary-text white-bg' data-todo-id="${id}">x</button>
             </div>`;
 }
 
@@ -120,7 +136,7 @@ const todoItemEventListener = () => {
     for (let i = 0; i < todoItems.length; i++) {
         todoItems[i].addEventListener("click", function () {
             const todoItem = todoItems[i].querySelector('.todo-text');
-            todoItem.classList.toggle("checked");;
+            todoItem.classList.toggle("checked");
         })
     }
 }
@@ -128,25 +144,38 @@ const todoItemEventListener = () => {
 const todoDeleteEventListener = () => {
     const todoDeleteBtns = document.querySelectorAll('.delete-btn');
     for (let i = 0; i < todoDeleteBtns.length; i++) {
-        todoDeleteBtns[i].addEventListener("click", function () {
-            const todoToDelete = todoDeleteBtns[i].parentNode;
-            todoToDelete.remove();
+        todoDeleteBtns[i].addEventListener("click", (event) => {
+            const todo_id = event.target.getAttribute('data-todo-id');
+            deleteTodo(todo_id);
         })
     }
 }
 
+const adjustScore = (score)
+
 loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const login = document.getElementById('username').value;
+    const login = document.getElementById('login').value;
     const password = document.getElementById('password').value;
     signIn(login,password);
-    populateTodos(currentUserID);
-
 });
+
+registerLink.addEventListener('click', () => {
+    loginComponent.classList.toggle('remove');
+    registerComponent.classList.toggle('remove');
+})
+
+registerForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('register-password').value;
+    signUp(username,email,password);
+})
 
 addBtn.addEventListener('click', addTodo);
 
-logoutBtn.addEventListener('click', function () {
+logoutBtn.addEventListener('click', () => {
     loginComponent.classList.toggle('remove');
     todoComponent.classList.toggle('remove');
     currentUserID = null;
