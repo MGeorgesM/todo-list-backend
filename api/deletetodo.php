@@ -9,7 +9,6 @@ $query->execute();
 $query->store_result();
 $todo_found = $query->num_rows();
 
-
 if ($todo_found > 0) {
     $delete_query = $mysqli->prepare('DELETE FROM todos WHERE id =?');
     $delete_query->bind_param('i', $todo_id);
