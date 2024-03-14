@@ -143,7 +143,7 @@ const generateTodo = (id, description, complete) => {
 
 const todoElement = (id, description, complete) => {
     const checkClass = complete ? 'checked' : '';
-    return `<div class="todo-item flex space-between primary-text" data-todo-id="${id}">
+    return `<div class="todo-item flex space-between primary-text">
                 <p class="todo-text ${checkClass}">${description}</p>
                 <button class="delete-btn primary-text white-bg" data-todo-id="${id}">x</button>
             </div>`;
@@ -153,10 +153,8 @@ const todoItemEventListener = () => {
     const todoItems = document.querySelectorAll('.todo-item');
     for (let i = 0; i < todoItems.length; i++) {
         todoItems[i].addEventListener("click", (event) => {
-            console.log(todoItems[i])
-            const todo_id = event.target.getAttribute('data-todo-id');
             const todoItem = todoItems[i].querySelector('.todo-text');
-            console.log('id tod', todo_id)
+            const todo_id = event.target.closest('.todo-item').querySelector('.delete-btn').getAttribute('data-todo-id');
             let is_checked = false;
             if(todoItem.classList.contains('checked')) {
                 is_checked = false;
@@ -175,8 +173,8 @@ const todoDeleteEventListener = () => {
     const todoDeleteBtns = document.querySelectorAll('.delete-btn');
     for (let i = 0; i < todoDeleteBtns.length; i++) {
         todoDeleteBtns[i].addEventListener("click", (event) => {
+            event.stopPropagation();
             const todo_id = event.target.getAttribute('data-todo-id');
-            console.log('delete', todo_id)
             deleteTodo(todo_id);
         })
     }

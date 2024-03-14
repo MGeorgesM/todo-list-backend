@@ -1,38 +1,39 @@
 <?php
 include 'connection.php';
 
-$user_id = $_POST['user_id'];
 $todo_id = $_POST['todo_id'];
-$todo_ischecked = $_POST['is_checked'];
 
-$get_todo = $mysqli->prepare('SELECT * FROM todos WHERE id=?');
-$get_todo->bind_param('i', $todo_id);
-$get_todo->execute();
-$get_todo->store_result();
+$query = $mysqli->prepare('SELECT complete, user_id FROM todos WHERE id =?');
+$query->bind_param('i', $todo_id);
+$query->execute();
+$query->store_result();
+$query->bind_result($complete, $user_id);
+$query->fetch();
+$todo_found = $query->num_rows();
 
-if ($get_todo->num_rows === 0) {
-    $response['Status'] = 'Error';
-    $response['Message'] = "Todo $todo_id is not found";
+if ($todo_found > 0) {
+    $delete_query = $mysqli->prepare('DELETE FROM todos WHERE id =?');
+    $delete_query->bind_param('i', $todo_id);
+    $delete_query->execute();
+    $response['Status'] = 'Deleting';
+    $response['Message'] = "Todo id $todo_id was deleted successfully";
+
+    if ($complete) {
+        $adjust_score = $mysqli->prepare('UPDATE users SET score = score -1 WHERE id = ?');
+        $adjust_score->bind_param('i', $user_id);
+        $adjust_score->execute();
+        $get_score = $mysqli->prepare('SELECT score FROM users WHERE id =?');
+        $get_score->bind_param('i', $user_id);
+        $get_score->execute();
+        $get_score->store_result();
+        $get_score->bind_result($score);
+        $get_score->fetch();
+
+        $response['Score'] = $score;
+    }
 } else {
-    $todo_ischecked_value = $todo_ischecked === 'true' ? 1 : 0;
-
-    $mark_todo = $mysqli->prepare('UPDATE todos SET complete = CASE WHEN ? THEN 1 ELSE 0 END WHERE id = ?');
-    $mark_todo->bind_param('ii', $todo_ischecked_value, $todo_id);
-    $mark_todo->execute();
-    $adjust_score = $mysqli->prepare(
-        'UPDATE users SET users.score = CASE WHEN ? THEN users.score + 1 ELSE users.score - 1 END WHERE users.id = ?'
-    );
-    $adjust_score->bind_param('ii', $todo_ischecked_value, $user_id);
-    $adjust_score->execute();
-    $get_score = $mysqli->prepare('SELECT score FROM users WHERE id =?');
-    $get_score->bind_param('i', $user_id);
-    $get_score->execute();
-    $get_score->store_result();
-    $get_score->bind_result($score);
-    $get_score->fetch();
-
-    $response['Status'] = 'Complete';
-    $response['Score'] = $score;
+    $response['Status'] = 'Error deleting';
+    $response['Message'] = "$todo_id was not found";
 }
 
 echo json_encode($response);
