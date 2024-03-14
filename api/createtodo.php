@@ -17,7 +17,6 @@ if($find_id->num_rows() === 0) {
     $query = $mysqli->prepare('INSERT INTO todos(description, user_id) VALUES(?, ?)');
     $query->bind_param('si', $todo_description, $user_id);
     $query->execute();
-    
     $response['Status'] = 'Success';
     $response['Message'] = 'Todo created successfully';
 }

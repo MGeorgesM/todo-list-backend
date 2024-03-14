@@ -1,17 +1,18 @@
 <?php
 header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
 
 include 'connection.php';
 
 $loginInput = $_POST['login'];
 $password = $_POST['password'];
 
-$query = $mysqli->prepare('SELECT id,username,password FROM users WHERE username=? OR email=?');
+$query = $mysqli->prepare('SELECT id,username,score,password FROM users WHERE username=? OR email=?');
 $query->bind_param('ss', $loginInput, $loginInput);
 $query->execute();
 $query->store_result();
-$query->bind_result($id, $username, $hashed_password);
+$query->bind_result($id, $username, $score, $hashed_password);
 $query->fetch();
 $num_rows = $query->num_rows();
 
@@ -20,13 +21,15 @@ if ($num_rows > 0) {
         $response['Status'] = 'Logged In';
         $response['User_Id'] = $id;
         $response['Username'] = $username;
+        $response['Score'] = $score;
+        $response['LoggedIn'] = true;
     } else {
-        http_response_code(401);
         $response['Message'] = 'Incorrect Username or Password';
+        $response['LoggedIn'] = false;
     }
 } else {
-    http_response_code(404);
     $response['Message'] = 'Username Not Found!';
+    $response['LoggedIn'] = false;
 }
 
 echo json_encode($response);

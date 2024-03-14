@@ -85,6 +85,30 @@ const signUp = async (username, email, password) => {
     }
 }
 
+const getTodos = async (user_id) => {
+    try {
+        const response = await axios.get(`/gettodos.php?user_id=${user_id}`);
+        return response.data.Todos;
+    } catch (error) {
+        throw Error(error.response.data.Message);
+    }
+}
+
+const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
+    const data = new FormData();
+    data.append('user_id', user_id);
+    data.append('todo_id', todo_id);
+    data.append('is_checked', is_checked);
+
+    try {
+        await axios.post('/toggletodo.php', data);
+        currentUserScore = response.data.Score;
+        currentUserScore ?? adjustScore(currentUserScore);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const addTodo = () => {
     const description = descriptionInput.value.trim();
     if (description === '') {
@@ -94,15 +118,6 @@ const addTodo = () => {
 
     descriptionInput.value = "";
     createTodo(currentUserID,description);
-}
-
-const getTodos = async (user_id) => {
-    try {
-        const response = await axios.get(`/gettodos.php?user_id=${user_id}`);
-        return response.data.Todos;
-    } catch (error) {
-        throw Error(error.response.data.Message);
-    }
 }
 
 const populateTodos = async () => {
@@ -137,6 +152,7 @@ const todoItemEventListener = () => {
     for (let i = 0; i < todoItems.length; i++) {
         todoItems[i].addEventListener("click", function () {
             const todoItem = todoItems[i].querySelector('.todo-text');
+            if(todoItem)
             todoItem.classList.toggle("checked");
         })
     }

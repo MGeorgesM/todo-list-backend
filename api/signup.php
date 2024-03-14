@@ -18,10 +18,10 @@ $check_username->store_result();
 $username_exists = $check_username->num_rows();
 
 if ($email_exists > 0) {
-    http_response_code(409);
+    $response['Registered'] = false;
     $response['Message'] = "Email $email already exists!";
 } elseif ($username_exists > 0) {
-    http_response_code(409);
+    $response['Registered'] = false;
     $response['Message'] = "Username $username already exists!";
 } else {
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
@@ -29,5 +29,6 @@ if ($email_exists > 0) {
     $query->bind_param('sss', $username, $email, $hashed_password);
     $query->execute();
     $response['Message'] = "User $username Was Created Successfully";
+    $response['Registered'] = true;
 }
 echo json_encode($response);
