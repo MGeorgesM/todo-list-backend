@@ -52,6 +52,7 @@ const signIn = async (login,password) => {
             todoComponent.classList.toggle('remove');
             currentUserID = response.data.User_Id;
             currentUserScore = response.data.Score;
+            adjustScore(currentUserScore);
             populateTodos(currentUserID);
             localStorage.setItem('currentUser', JSON.stringify(currentUserID));
         } else {
@@ -151,7 +152,9 @@ const todoDeleteEventListener = () => {
     }
 }
 
-const adjustScore = (score)
+const adjustScore = (score) => {
+    scoreDisplay.innerHTML = score;
+}
 
 loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
