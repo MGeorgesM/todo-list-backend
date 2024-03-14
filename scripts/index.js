@@ -101,8 +101,9 @@ const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
     data.append('is_checked', is_checked);
 
     try {
-        await axios.post('/toggletodo.php', data);
+        const response = await axios.post('/toggletodo.php', data);
         currentUserScore = response.data.Score;
+        console.log('response',response.data.Score)
         currentUserScore ?? adjustScore(currentUserScore);
     } catch (error) {
         console.log(error)
@@ -150,10 +151,19 @@ const todoElement = (id, description, complete) => {
 const todoItemEventListener = () => {
     const todoItems = document.querySelectorAll('.todo-item');
     for (let i = 0; i < todoItems.length; i++) {
-        todoItems[i].addEventListener("click", function () {
+        todoItems[i].addEventListener("click", (event) => {
+            const todo_id = event.target.getAttribute('data-todo-id');
             const todoItem = todoItems[i].querySelector('.todo-text');
-            if(todoItem)
-            todoItem.classList.toggle("checked");
+            let is_checked = false;
+            if(todoItem.classList.contains('checked')) {
+                is_checked = false;
+                todoItem.classList.remove("checked");
+                toggleTodoStatus(currentUserID,todo_id,is_checked);
+            } else {
+                is_checked = true;
+                todoItem.classList.add("checked");
+                toggleTodoStatus(currentUserID,todo_id,is_checked);
+            }
         })
     }
 }
