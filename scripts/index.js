@@ -2,11 +2,16 @@ const loginForm = document.getElementById('login-form');
 const loginComponent = document.getElementById('login-component');
 const validationDisplaySignIn = document.getElementById('validationDisplaySignIn');
 const registerLink = document.getElementById('register-link');
+const loginInput = document.getElementById('login');
+const loginPasswordInput = document.getElementById('password');
 
 const registerForm = document.getElementById('register-form');
 const registerComponent = document.getElementById('register-component');
 const validationDisplaySignUp = document.getElementById('validationDisplaySignUp');
 const loginLink = document.getElementById('login-link');
+const usernameInput = document.getElementById('username');
+const emailInput = document.getElementById('email');
+const registerPasswordInput = document.getElementById('register-password');
 
 const todoComponent = document.getElementById('todo-component');
 const descriptionInput = document.getElementById('descriptionInput');
@@ -49,18 +54,18 @@ const updateTodo = async (todo_id, todo_description) => {
     await axios.post('/updatetodo.php', data);
   }
   populateTodos(currentUserID);
-}
+};
 
 const signIn = async (login, password) => {
   const data = new FormData();
   data.append('login', login);
   data.append('password', password);
-  console.log('signing in')
+  console.log('signing in');
   try {
     const response = await axios.post('/signin.php', data);
     if (response.data.LoggedIn) {
       loginComponent.classList.toggle('remove');
-      adjustOnLogin(response)
+      adjustOnLogin(response);
     } else {
       throw Error(response.data.Message);
     }
@@ -104,7 +109,8 @@ const adjustOnLogin = (response) => {
   currentUserScore = response.data.Score;
   saveUserIdLocally(currentUserID);
   populateTodos(currentUserID);
-}
+  clearForms();
+};
 
 const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
   const data = new FormData();
@@ -124,24 +130,20 @@ const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
 };
 
 const addTodo = () => {
-
   try {
     const description = descriptionInput.value.trim();
     if (description === '' && !currentTaskSelectedId) {
-      throw Error('Please enter a valid task')
+      throw Error('Please enter a valid task');
     }
 
     if (currentTaskSelectedId) {
       updateTodo(currentTaskSelectedId, description);
     } else {
       createTodo(currentUserID, description);
-
     }
-    
   } catch (error) {
     validationInputDisplay.innerText = error.message;
   }
-
 };
 
 const populateTodos = async () => {
@@ -216,16 +218,24 @@ const todoTextEventListener = () => {
       // localStorage.setItem('currentTaskSelectedID', todoId)
       descriptionInput.value = todoText.innerHTML;
       addBtn.innerHTML = 'Edit';
-    })
-  })
-}
+    });
+  });
+};
 
 const adjustScore = (score) => {
-  if(!score){
+  if (!score) {
     score = 0;
   }
   scoreDisplay.innerHTML = score;
   saveScoreLocally(score);
+};
+
+const clearForms = () => {
+  loginInput.value = '';
+  loginPasswordInput.value = '';
+  emailInput.value = '';
+  usernameInput.value = '';
+  registerPasswordInput.value = '';
 };
 
 const saveScoreLocally = (score) => {
@@ -234,15 +244,15 @@ const saveScoreLocally = (score) => {
 
 const saveUserIdLocally = (id) => {
   localStorage.setItem('currentUser', JSON.stringify(id));
-}
+};
 
 const checkCurrentUser = () => {
   return JSON.parse(localStorage.getItem('currentUser')) || null;
-}
+};
 
 const currentUserStored = checkCurrentUser();
 
-if(currentUserStored) {
+if (currentUserStored) {
   currentUserID = currentUserStored;
   currentUserScore = JSON.parse(localStorage.getItem('currentUserScore')) || 0;
   loginComponent.classList.toggle('remove');
@@ -250,11 +260,10 @@ if(currentUserStored) {
   populateTodos(currentUserID);
 }
 
-
 loginForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  const login = document.getElementById('login').value;
-  const password = document.getElementById('password').value;
+  const login = loginInput.value;
+  const password = loginPasswordInput.value;
   signIn(login, password);
 });
 
@@ -270,9 +279,9 @@ loginLink.addEventListener('click', () => {
 
 registerForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  const username = document.getElementById('username').value;
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('register-password').value;
+  const username = usernameInput.value;
+  const email = emailInput.value;
+  const password = registerPasswordInput.value;
   signUp(username, email, password);
 });
 
@@ -281,7 +290,7 @@ descriptionInput.addEventListener('keypress', (event) => {
   if (event.key === 'Enter') {
     addTodo();
   }
-})
+});
 
 logoutBtn.addEventListener('click', () => {
   loginComponent.classList.toggle('remove');

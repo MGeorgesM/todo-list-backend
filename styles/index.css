@@ -64,10 +64,6 @@ input {
     ;
 }
 
-input:focus {
-    border: 1px solid #74c0fc;
-}
-
 .login-btn,
 .register-btn {
     width: 100%;
@@ -128,9 +124,12 @@ input:focus {
 }
 
 .todo-item:hover {
-    color: #74c0fc;
     cursor: pointer;
     box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.todo-text:hover {
+    color: #74c0fc;
 }
 
 .todo-item:first-child {

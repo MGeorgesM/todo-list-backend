@@ -28,7 +28,9 @@ if ($email_exists > 0) {
     $query = $mysqli->prepare('INSERT INTO users(username,email,password) VALUES(?,?,?)');
     $query->bind_param('sss', $username, $email, $hashed_password);
     $query->execute();
+    $user_id = $mysqli->insert_id;
     $response['Message'] = "User $username Was Created Successfully";
     $response['Registered'] = true;
+    $response['User_Id'] = $user_id;
 }
 echo json_encode($response);
