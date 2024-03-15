@@ -60,7 +60,6 @@ const signIn = async (login, password) => {
   const data = new FormData();
   data.append('login', login);
   data.append('password', password);
-  console.log('signing in');
   try {
     const response = await axios.post('/signin.php', data);
     if (response.data.LoggedIn) {
@@ -215,7 +214,6 @@ const todoTextEventListener = () => {
     todoText.addEventListener('click', (event) => {
       event.stopPropagation();
       currentTaskSelectedId = todoText.getAttribute('data-todo-id');
-      // localStorage.setItem('currentTaskSelectedID', todoId)
       descriptionInput.value = todoText.innerHTML;
       addBtn.innerHTML = 'Edit';
     });
