@@ -64,6 +64,10 @@ input {
     ;
 }
 
+input:focus {
+    border: 1px solid #74c0fc;
+}
+
 .login-btn,
 .register-btn {
     width: 100%;
@@ -160,7 +164,7 @@ input {
 }
 
 .validationDisplay {
-    color: red;
+    color: #f03e3eed;
 }
 
 .register-link:hover,

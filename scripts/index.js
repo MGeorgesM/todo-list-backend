@@ -11,6 +11,7 @@ const loginLink = document.getElementById('login-link');
 const todoComponent = document.getElementById('todo-component');
 const descriptionInput = document.getElementById('descriptionInput');
 const validationInputDisplay = document.getElementById('input-validation');
+const todoText = document.getElementById('todo-text');
 const addBtn = document.getElementById('add-btn');
 const todoList = document.getElementById('todo-list');
 const logoutBtn = document.getElementById('logout-btn');
@@ -18,6 +19,7 @@ const scoreDisplay = document.getElementById('score-display');
 
 let currentUserID = null;
 let currentUserScore = null;
+let currentTaskSelectedId = null;
 
 axios.defaults.baseURL = 'http://localhost/api';
 
@@ -39,11 +41,21 @@ const deleteTodo = async (todo_id) => {
   populateTodos(currentUserID);
 };
 
+const updateTodo = async (todo_id, todo_description) => {
+  if (todo_description) {
+    const data = new FormData();
+    data.append('todo_id', todo_id);
+    data.append('todo_description', todo_description);
+    await axios.post('/updatetodo.php', data);
+  }
+  populateTodos(currentUserID);
+}
+
 const signIn = async (login, password) => {
   const data = new FormData();
   data.append('login', login);
   data.append('password', password);
-
+  console.log('signing in')
   try {
     const response = await axios.post('/signin.php', data);
     if (response.data.LoggedIn) {
@@ -112,12 +124,19 @@ const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
 };
 
 const addTodo = () => {
+
   try {
     const description = descriptionInput.value.trim();
-    if (description === '') {
+    if (description === '' && !currentTaskSelectedId) {
       throw Error('Please enter a valid task')
     }
-    createTodo(currentUserID, description);
+
+    if (currentTaskSelectedId) {
+      updateTodo(currentTaskSelectedId, description);
+    } else {
+      createTodo(currentUserID, description);
+
+    }
     
   } catch (error) {
     validationInputDisplay.innerText = error.message;
@@ -127,9 +146,11 @@ const addTodo = () => {
 
 const populateTodos = async () => {
   adjustScore(currentUserScore);
+  currentTaskSelectedId = null;
   validationInputDisplay.innerText = '';
   descriptionInput.value = '';
   todoList.innerHTML = '';
+  addBtn.innerHTML = 'Add';
   const todos = await getTodos(currentUserID);
   if (!todos) {
     return;
@@ -139,6 +160,7 @@ const populateTodos = async () => {
     generateTodo(id, description, complete);
   });
   todoItemEventListener();
+  todoTextEventListener();
   todoDeleteEventListener();
 };
 
@@ -149,7 +171,7 @@ const generateTodo = (id, description, complete) => {
 const todoElement = (id, description, complete) => {
   const checkClass = complete ? 'checked' : '';
   return `<div class="todo-item flex space-between primary-text">
-                <p class="todo-text ${checkClass}">${description}</p>
+                <p class="todo-text ${checkClass}" data-todo-id="${id}">${description}</p>
                 <button class="delete-btn primary-text white-bg" data-todo-id="${id}">X</button>
             </div>`;
 };
@@ -184,6 +206,19 @@ const todoDeleteEventListener = () => {
     });
   }
 };
+
+const todoTextEventListener = () => {
+  const todoTexts = document.querySelectorAll('.todo-text');
+  todoTexts.forEach((todoText) => {
+    todoText.addEventListener('click', (event) => {
+      event.stopPropagation();
+      currentTaskSelectedId = todoText.getAttribute('data-todo-id');
+      // localStorage.setItem('currentTaskSelectedID', todoId)
+      descriptionInput.value = todoText.innerHTML;
+      addBtn.innerHTML = 'Edit';
+    })
+  })
+}
 
 const adjustScore = (score) => {
   if(!score){
