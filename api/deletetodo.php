@@ -11,14 +11,13 @@ $query->bind_result($complete, $user_id);
 $query->fetch();
 $todo_found = $query->num_rows();
 
-
 if ($todo_found > 0) {
     $delete_query = $mysqli->prepare('DELETE FROM todos WHERE id =?');
     $delete_query->bind_param('i', $todo_id);
     $delete_query->execute();
     $response['Status'] = 'Deleting';
     $response['Message'] = "Todo id $todo_id was deleted successfully";
-    
+
     if ($complete) {
         $adjust_score = $mysqli->prepare('UPDATE users SET score = score -1 WHERE id = ?');
         $adjust_score->bind_param('i', $user_id);

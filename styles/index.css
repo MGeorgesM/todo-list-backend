@@ -16,7 +16,7 @@ body {
 .container {
     width: 400px;
     margin: 256px auto;
-    padding: 16px ;
+    padding: 16px;
     border-radius: 8px;
     box-shadow: 0 20px 20px 0 rgba(0, 0, 0, 0.1);
     border: 1px solid #e9ecef;
@@ -40,7 +40,8 @@ body {
 }
 
 
-.login-btn, .register-btn {
+.login-btn,
+.register-btn {
     width: 10%;
     padding-top: 4px;
     padding-right: 4px;
@@ -59,10 +60,12 @@ input {
     width: 100%;
     padding: 12px;
     border: 1px solid #e9ecef;
-    border-radius: 4px;;
+    border-radius: 4px;
+    ;
 }
 
-.login-btn, .register-btn {
+.login-btn,
+.register-btn {
     width: 100%;
     padding: 12px;
     margin: 16px auto 32px auto;
@@ -72,7 +75,8 @@ input {
     font-size: 18px;
 }
 
-.login-btn:hover, .register-btn:hover {
+.login-btn:hover,
+.register-btn:hover {
     background-color: #74c0fc;
 }
 
@@ -129,9 +133,13 @@ input {
     border-top: none;
 }
 
+.input-validation {
+    color: #f03e3eed;
+    padding: 4px;
+}
+
 .delete-btn {
-    text-align: center;
-    max-height: 75%;
+    max-height: 100%;
     margin-right: 16px;
     border-radius: 0;
     border: none;
@@ -155,7 +163,8 @@ input {
     color: red;
 }
 
-.register-link:hover {
+.register-link:hover,
+.login-link:hover {
     color: #74c0fc;
 }
 

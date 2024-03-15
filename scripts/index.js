@@ -6,9 +6,11 @@ const registerLink = document.getElementById('register-link');
 const registerForm = document.getElementById('register-form');
 const registerComponent = document.getElementById('register-component');
 const validationDisplaySignUp = document.getElementById('validationDisplaySignUp');
+const loginLink = document.getElementById('login-link');
 
 const todoComponent = document.getElementById('todo-component');
 const descriptionInput = document.getElementById('descriptionInput');
+const validationInputDisplay = document.getElementById('input-validation');
 const addBtn = document.getElementById('add-btn');
 const todoList = document.getElementById('todo-list');
 const logoutBtn = document.getElementById('logout-btn');
@@ -34,9 +36,6 @@ const deleteTodo = async (todo_id) => {
 
   const response = await axios.post('/deletetodo.php', data);
   currentUserScore = response.data.Score;
-  if (currentUserScore !== null && currentUserScore !== undefined) {
-    adjustScore(currentUserScore);
-  }
   populateTodos(currentUserID);
 };
 
@@ -49,12 +48,7 @@ const signIn = async (login, password) => {
     const response = await axios.post('/signin.php', data);
     if (response.data.LoggedIn) {
       loginComponent.classList.toggle('remove');
-      todoComponent.classList.toggle('remove');
-      currentUserID = response.data.User_Id;
-      currentUserScore = response.data.Score;
-      adjustScore(currentUserScore);
-      populateTodos(currentUserID);
-      localStorage.setItem('currentUser', JSON.stringify(currentUserID));
+      adjustOnLogin(response)
     } else {
       throw Error(response.data.Message);
     }
@@ -74,7 +68,7 @@ const signUp = async (username, email, password) => {
 
     if (response.data.Registered) {
       registerComponent.classList.toggle('remove');
-      todoComponent.classList.toggle('remove');
+      adjustOnLogin(response);
     } else {
       throw Error(response.data.Message);
     }
@@ -91,6 +85,14 @@ const getTodos = async (user_id) => {
     throw Error(error.response.data.Message);
   }
 };
+
+const adjustOnLogin = (response) => {
+  todoComponent.classList.toggle('remove');
+  currentUserID = response.data.User_Id;
+  currentUserScore = response.data.Score;
+  saveUserIdLocally(currentUserID);
+  populateTodos(currentUserID);
+}
 
 const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
   const data = new FormData();
@@ -110,17 +112,23 @@ const toggleTodoStatus = async (user_id, todo_id, is_checked) => {
 };
 
 const addTodo = () => {
-  const description = descriptionInput.value.trim();
-  if (description === '') {
-    alert('Please enter a valid task');
-    return;
+  try {
+    const description = descriptionInput.value.trim();
+    if (description === '') {
+      throw Error('Please enter a valid task')
+    }
+    createTodo(currentUserID, description);
+    
+  } catch (error) {
+    validationInputDisplay.innerText = error.message;
   }
 
-  descriptionInput.value = '';
-  createTodo(currentUserID, description);
 };
 
 const populateTodos = async () => {
+  adjustScore(currentUserScore);
+  validationInputDisplay.innerText = '';
+  descriptionInput.value = '';
   todoList.innerHTML = '';
   const todos = await getTodos(currentUserID);
   if (!todos) {
@@ -130,7 +138,6 @@ const populateTodos = async () => {
     const { id, description, complete } = todo;
     generateTodo(id, description, complete);
   });
-
   todoItemEventListener();
   todoDeleteEventListener();
 };
@@ -179,8 +186,35 @@ const todoDeleteEventListener = () => {
 };
 
 const adjustScore = (score) => {
+  if(!score){
+    score = 0;
+  }
   scoreDisplay.innerHTML = score;
+  saveScoreLocally(score);
 };
+
+const saveScoreLocally = (score) => {
+  localStorage.setItem('currentUserScore', JSON.stringify(score));
+};
+
+const saveUserIdLocally = (id) => {
+  localStorage.setItem('currentUser', JSON.stringify(id));
+}
+
+const checkCurrentUser = () => {
+  return JSON.parse(localStorage.getItem('currentUser')) || null;
+}
+
+const currentUserStored = checkCurrentUser();
+
+if(currentUserStored) {
+  currentUserID = currentUserStored;
+  currentUserScore = JSON.parse(localStorage.getItem('currentUserScore')) || 0;
+  loginComponent.classList.toggle('remove');
+  todoComponent.classList.toggle('remove');
+  populateTodos(currentUserID);
+}
+
 
 loginForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -194,6 +228,11 @@ registerLink.addEventListener('click', () => {
   registerComponent.classList.toggle('remove');
 });
 
+loginLink.addEventListener('click', () => {
+  loginComponent.classList.toggle('remove');
+  registerComponent.classList.toggle('remove');
+});
+
 registerForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const username = document.getElementById('username').value;
@@ -203,9 +242,15 @@ registerForm.addEventListener('submit', (event) => {
 });
 
 addBtn.addEventListener('click', addTodo);
+descriptionInput.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    addTodo();
+  }
+})
 
 logoutBtn.addEventListener('click', () => {
   loginComponent.classList.toggle('remove');
   todoComponent.classList.toggle('remove');
-  currentUserID = null;
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('currentUserScore');
 });
